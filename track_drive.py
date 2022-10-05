@@ -484,6 +484,7 @@ def lane_drive():
 # ====================================
 def object_detection():
 
+    target_x_pos = 0
     boxes = box_data
     target_found = False
     
@@ -493,9 +494,10 @@ def object_detection():
         probability = round(bbox.probability, 2)
                 
         if ((class_name == "bottle") and (probability > 0.3)):
-            target_found = True                 
+            target_found = True 
+            target_x_pos = (bbox.xmin + bbox.xmax)//2                
 
-    return target_found
+    return target_found, target_x_pos
 
         
 #=============================================
@@ -839,12 +841,14 @@ def yolo_drive():
 
         box_ready = False
 
-        # 사진에서 타겟 객체 위치 찾기
-        target_found = object_detection()
+        target_found, target_x_pos = object_detection()
         if target_found == True:
-            return "right"
+            if target_x_pos > 320:
+                return "right"
+            elif target_x_pos < 320:
+                return "left"
 
-    return "left"
+    return "left" # 인식 실패시 가는 방향 
             
             
 #=============================================
